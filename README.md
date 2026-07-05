@@ -5,13 +5,13 @@ WHS4 교육 일정 상태를 반환하는 간단한 npm 패키지입니다.
 ## Install
 
 ```bash
-npm install whs4
+npm install whs4_npm
 ```
 
 ## Usage
 
 ```javascript
-const { getStatus } = require("whs4");
+const { getStatus } = require("whs4_npm");
 
 console.log(getStatus().message);
 ```
