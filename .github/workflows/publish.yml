@@ -33,8 +33,8 @@ jobs:
           package-manager-cache: false # release build에서는 package manager cache를 사용하지 않습니다.
 
 
-      - name: Install dependencies # npm install이 아니라 npm ci를 사용합니다.
-        run: npm ci
+      #- name: Install dependencies # npm install이 아니라 npm ci를 사용합니다.
+      #  run: npm ci
 
       - name: Show package information # 실제 publish하려는 package name과 version을 출력합니다.
         run: |
