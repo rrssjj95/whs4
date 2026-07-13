@@ -1,0 +1,45 @@
+# GitHub Actions UI에 표시되는 워크플로우 이름입니다.
+name: Publish Package to npm
+
+on:
+  push:
+    branches:
+      - release # 오직 release 브랜치에 push가 발생했을 때만 실행합니다.
+    paths:
+      - 'package.json' # package.json이 변경된 push에 대해서만 실행합니다.
+
+permissions:
+  contents: read # 워크플로우 전체에는 최소한의 기본 권한만 줍니다.
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/release' # publish job 자체에서도 현재 ref가 정확히 release인지 다시 확인합니다.
+    
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # actions/checkout이 repository 내용을 읽기 위해 필요합니다.
+      id-token: write #  GitHub Actions job이 GitHub OIDC Provider에 ID Token(JWT)을 요청할 수 있도록 허용합니다.
+
+    steps:
+      - name: Checkout repository # 현재 GitHub-hosted runner에 repository 코드를 가져옵니다.
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24' # npm Trusted Publishing의 현재 공식 예제에 맞춰 Node.js 24를 사용합니다.
+          registry-url: 'https://registry.npmjs.org' # publish 대상 npm registry를 명시합니다.
+          package-manager-cache: false # release build에서는 package manager cache를 사용하지 않습니다.
+
+
+      - name: Install dependencies # npm install이 아니라 npm ci를 사용합니다.
+        run: npm ci
+
+      - name: Show package information # 실제 publish하려는 package name과 version을 출력합니다.
+        run: |
+          echo "Package: $(node -p "require('./package.json').name")"
+          echo "Version: $(node -p "require('./package.json').version")"
+
+      - name: Publish package to npm
+        run: npm publish --access public
